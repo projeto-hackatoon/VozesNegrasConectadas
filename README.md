@@ -1,4 +1,5 @@
-# 📢 Plataforma de Amplificação de Vozes — Rede Social Cultural  
+# 📢 VozesNegrasConectadas
+Plataforma de Amplificação de Vozes — Rede Social Cultural  
 **Projeto desenvolvido com Django, HTML, CSS e JavaScript**
 
 Este projeto tem como objetivo criar uma plataforma digital para amplificar vozes, produções culturais e narrativas da comunidade negra. A plataforma oferece um espaço seguro, colaborativo e acessível para compartilhamento de conteúdos artísticos, culturais e sociais, garantindo curadoria, valorização e visibilidade.
