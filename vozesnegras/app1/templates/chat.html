@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Acolhedor</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ece5dd; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .chat-container { width: 90%; max-width: 400px; background: white; height: 80vh; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; }
+        .header { background: #6c5ce7; color: white; padding: 15px; text-align: center; font-weight: bold; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .user { align-self: flex-end; background: #6c5ce7; color: white; border-bottom-right-radius: 2px; }
+        .bot { align-self: flex-start; background: #f1f0f0; color: #333; border-bottom-left-radius: 2px; }
+        .input-area { padding: 15px; background: #f9f9f9; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        button { padding: 10px 20px; background: #6c5ce7; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #5a4ad1; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="header">✊🏿 Acolhedor Virtual</div>
+    <div id="chat-box">
+        <div class="msg bot">Olá! Sou um espaço seguro para escuta. Como você está se sentindo hoje?</div>
+    </div>
+    <div class="input-area">
+        <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
+        <button onclick="enviarMensagem()">Enviar</button>
+    </div>
+</div>
+
+<script>
+    async function enviarMensagem() {
+        let input = document.getElementById('msgInput');
+        let texto = input.value;
+        if (!texto.trim()) return;
+
+        // Adiciona mensagem do usuário
+        adicionarNaTela(texto, 'user');
+        input.value = '';
+        input.focus();
+
+        // Adiciona "Digitando..."
+        let idDigitando = adicionarNaTela('Digitando...', 'bot');
+
+        try {
+            let response = await fetch('/api/chat/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 'mensagem': texto })
+            });
+
+            let dados = await response.json();
+            
+            // Remove o "digitando" e põe a resposta real
+            document.getElementById(idDigitando).remove();
+            adicionarNaTela(dados.resposta, 'bot');
+        } catch (error) {
+            document.getElementById(idDigitando).remove();
+            adicionarNaTela("Erro de conexão. Tente novamente.", 'bot');
+        }
+    }
+
+    function adicionarNaTela(texto, classe) {
+        let div = document.createElement('div');
+        div.className = 'msg ' + classe;
+        div.innerText = texto;
+        
+        // Se for mensagem de carregamento, dá um ID pra gente apagar depois
+        if(texto === 'Digitando...') {
+            div.id = 'temp-loading';
+            div.style.fontStyle = 'italic';
+            div.style.color = '#888';
+        }
+
+        let chatBox = document.getElementById('chat-box');
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight; // Rola pra baixo
+        return div.id;
+    }
+
+    // Enviar com Enter
+    document.getElementById("msgInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") enviarMensagem();
+    });
+</script>
+
+</body>
+</html>
